@@ -1,0 +1,50 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wayfinder",
+  "version": "1.0.0",
+  "description": "Walkable neighborhood trip architect with live weather, currency rates, interactive maps, and .ics/.trip editors.",
+  "author": {
+    "name": "Wayfinder Open Source Contributors",
+    "url": "https://github.com/YOUR_GITHUB/wayfinder-plugin"
+  },
+  "license": "MIT",
+  "keywords": [
+    "travel",
+    "itinerary",
+    "maps",
+    "openstreetmap",
+    "weather",
+    "mcp-apps"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json",
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/setup/SKILL.md",
+      "interface": {
+        "displayName": "Wayfinder",
+        "shortDescription": "Walkable trips, maps & FX",
+        "longDescription": "Wayfinder combines zero-key open travel data (OpenStreetMap, Open-Meteo, Frankfurter FX, Wikimedia Commons) with interactive neighborhood maps, a live thread itinerary tray, and a desktop .trip/.ics file editor.",
+        "developerName": "Wayfinder OSS",
+        "category": "Travel",
+        "capabilities": [
+          "Interactive",
+          "Write"
+        ],
+        "websiteURL": "https://github.com/YOUR_GITHUB/wayfinder-plugin",
+        "supportURL": "https://github.com/YOUR_GITHUB/wayfinder-plugin/issues",
+        "privacyPolicyURL": "https://YOUR_GITHUB.github.io/wayfinder-plugin/privacy",
+        "termsOfServiceURL": "https://YOUR_GITHUB.github.io/wayfinder-plugin/terms",
+        "defaultPrompt": [
+          "Plan a walkable 3-day Kyoto neighborhood itinerary with live weather and JPY->USD budget",
+          "Explore walkable cafes and museums in Lisbon Baixa on the interactive map",
+          "Audit my saved Kyoto trip for rainy-day indoor swaps and export a .ics file"
+        ],
+        "brandColor": "#0F766E",
+        "brandColorDark": "#34D399",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      }
+    }
+  }
+}
