@@ -3,7 +3,7 @@
   "mcpServers": {
     "wayfinder": {
       "type": "streamable-http",
-      "url": "https://wayfinder.YOUR_SUBDOMAIN.workers.dev/mcp",
+      "url": "https://photographers-achievement-captain-indices.trycloudflare.com/mcp",
       "extensions": {
         "com.openai": {
           "auth": {
