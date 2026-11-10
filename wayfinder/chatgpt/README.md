@@ -1,5 +1,34 @@
 # Wayfinder development in ChatGPT desktop
 
+## Desktop-local stdio workflow
+
+The plugin now defaults to a local stdio MCP process. ChatGPT desktop launches
+`node ${PLUGIN_ROOT}/server/dist/stdio.mjs` when connecting to the plugin in a
+local chat. Node.js 22 must be available on the desktop host's PATH.
+
+To rebuild the packaged server and explorer after source changes, run:
+
+```bash
+cd wayfinder/chatgpt/web
+npm ci
+cd ../server
+npm ci
+npm run build:plugin
+```
+
+Include `server/dist/stdio.mjs` and `web/dist/explore.html` from the plugin folder
+when updating the installed release, alongside its stdio `mcp.json` and updated
+manifest. These generated files are ignored by Git and must be rebuilt before
+packaging. Set `extensions.com.openai.requires_local_executor` to `true`.
+
+For direct protocol testing, use `npm run stdio` in the server folder with an
+MCP stdio client. The desktop host owns the installed server process. Start a new
+local chat after installing an update so the host can connect to the new release.
+
+The following HTTP and Cloudflare workflow remains available for remote testing.
+Switching back to remote transport requires an HTTP entry in the plugin's MCP
+configuration.
+
 Run the MCP server locally, expose it through Cloudflare, and connect the installed
 Wayfinder plugin to the public HTTPS endpoint. Local source changes and installed
 plugin releases have separate update steps.

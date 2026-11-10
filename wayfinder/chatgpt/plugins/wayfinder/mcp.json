@@ -2,15 +2,12 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
     "wayfinder": {
-      "type": "streamable-http",
-      "url": "https://photographers-achievement-captain-indices.trycloudflare.com/mcp",
-      "extensions": {
-        "com.openai": {
-          "auth": {
-            "type": "none"
-          }
-        }
-      }
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/server/dist/stdio.mjs"
+      ],
+      "cwd": "${PLUGIN_ROOT}"
     }
   }
 }
