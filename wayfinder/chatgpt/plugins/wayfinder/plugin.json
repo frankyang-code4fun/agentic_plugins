@@ -1,51 +1,33 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "wayfinder",
-  "version": "1.0.2",
-  "description": "Walkable neighborhood trip architect with live weather, currency rates, interactive maps, and .ics/.trip editors.",
   "author": {
-    "name": "Wayfinder Open Source Contributors",
-    "url": "https://github.com/YOUR_GITHUB/wayfinder-plugin"
+    "email": "xiaoy1028@gmail.com",
+    "name": "Frank Yang"
   },
-  "license": "MIT",
-  "keywords": [
-    "travel",
-    "itinerary",
-    "maps",
-    "openstreetmap",
-    "weather",
-    "mcp-apps"
-  ],
-  "skills": "./skills/",
-  "mcpServers": "./mcp.json",
+  "description": "Plan walkable neighborhood itineraries with weather checks, currency conversion, and calendar and route exports.",
   "extensions": {
     "com.openai": {
-      "onboardingSkill": "./skills/setup/SKILL.md",
       "interface": {
-        "displayName": "Wayfinder",
-        "shortDescription": "Walkable trips, maps & FX",
-        "longDescription": "Wayfinder combines zero-key open travel data (OpenStreetMap, Open-Meteo, Frankfurter FX, Wikimedia Commons) with interactive neighborhood maps, a live thread itinerary tray, and a desktop .trip/.ics file editor.",
-        "developerName": "Wayfinder OSS",
-        "category": "Travel",
-        "capabilities": [
-          "Interactive",
-          "Write"
-        ],
-        "websiteURL": "https://github.com/YOUR_GITHUB/wayfinder-plugin",
-        "supportURL": "https://github.com/YOUR_GITHUB/wayfinder-plugin/issues",
-        "privacyPolicyURL": "https://YOUR_GITHUB.github.io/wayfinder-plugin/privacy",
-        "termsOfServiceURL": "https://YOUR_GITHUB.github.io/wayfinder-plugin/terms",
+        "category": "Productivity",
+        "composerIcon": "./assets/compass.svg",
         "defaultPrompt": [
-          "Plan a walkable 3-day Kyoto neighborhood itinerary with live weather and JPY->USD budget",
-          "Explore walkable cafes and museums in Lisbon Baixa on the interactive map",
-          "Audit my saved Kyoto trip for rainy-day indoor swaps and export a .ics file"
+          "Plan a 3-day walkable city trip with neighborhood clusters and transit buffers. Ask me for the destination and dates.",
+          "Audit my itinerary for rain and suggest nearby indoor backups. Ask me to share the itinerary and dates.",
+          "Export my itinerary as an .ics schedule using local event times. Ask me for any missing dates, times, or destination."
         ],
-        "brandColor": "#0F766E",
-        "brandColorDark": "#34D399",
-        "composerIcon": "./assets/icon.png",
-        "logo": "./assets/logo.png"
+        "developerName": "Frank Yang",
+        "displayName": "Wayfinder",
+        "logo": "./assets/compass.svg",
+        "longDescription": "Plan realistic city days with neighborhood clusters, transit buffers, rain alternatives, and calendar and route exports. Live checks depend on the tools available in the host.",
+        "shortDescription": "Walkable travel itineraries"
       },
-      "requires_local_executor": true
+      "requires_local_executor": true,
+      "onboardingSkill": "./skills/setup/SKILL.md"
     }
-  }
+  },
+  "license": "MIT",
+  "name": "wayfinder",
+  "version": "0.1.6",
+  "mcpServers": "./mcp.json",
+  "repository": "https://github.com/frankyang-code4fun/agentic_plugins"
 }

@@ -1,3 +1,5 @@
+import { registerSettings } from "./settings.js";
+import { registerMentionsAndForms } from "./mentions-and-forms.js";
 import { registerFileEditor } from "./file-editor.js";
 import { registerWorkspaceEntrypoints } from "./entrypoints.js";
 import { registerExploreUi } from "./ui-explore.js";
@@ -5,7 +7,7 @@ import { z } from "zod";
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 // Keep critical tool-sequencing guidance within the first 512 chars!
-const SERVER_INSTRUCTIONS = `Wayfinder plans walkable trips with live data.
+const SERVER_INSTRUCTIONS = `Wayfinder plans walkable trips with live data. Read settings.read before planning; explicit user choices override saved defaults.
 1. Call search_neighborhood_pois and get_weather_and_fx FIRST to gather real coordinates, forecasts, and FX rates.
 2. Call render_neighborhood_explorer to display interactive maps/carousels once POIs are selected.
 3. Only call hold_boutique_stay when the user explicitly asks to place a reservation hold.`;
@@ -50,7 +52,18 @@ async function fetchSearchJson(
 export function createWayfinderServer() {
   const server = new McpServer(
     { name: "wayfinder", version: "1.0.0" },
-    { instructions: SERVER_INSTRUCTIONS },
+    {
+      instructions: SERVER_INSTRUCTIONS,
+      capabilities: {
+        extensions: {
+          "openai/mentions": { searchTool: "wayfinder.mentions" },
+          "openai/settings": {
+            readTool: "settings.read",
+            updateTool: "settings.update",
+          },
+        },
+      },
+    },
   );
   // 1. READ-ONLY DATA TOOL: Geocoding + Walkable POIs via OpenStreetMap (Zero API Key)
   server.registerTool(
@@ -211,5 +224,7 @@ export function createWayfinderServer() {
   registerExploreUi(server);
   registerWorkspaceEntrypoints(server);
   registerFileEditor(server);
+  registerMentionsAndForms(server);
+  registerSettings(server);
   return server;
 }

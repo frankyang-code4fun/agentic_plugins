@@ -62,6 +62,8 @@ export function registerWorkspaceEntrypoints(server: McpServer) {
       async ({ tripId }) => ({
         structuredContent: {
           mode,
+          pluginRoute:
+            process.env.WAYFINDER_PLUGIN_ROUTE || "wayfinder@wayfinder-oss",
           trips: await listTrips(),
           activeTripId: tripId ?? null,
         },

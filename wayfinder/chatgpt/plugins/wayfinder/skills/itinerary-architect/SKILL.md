@@ -1,39 +1,41 @@
 ---
 name: itinerary-architect
-description: Plan or revise walkable city itineraries, audit rain alternatives, convert trip costs, and export itinerary calendars or routes.
+description: Plan or revise a walkable city itinerary, day plan, or multi-day neighborhood route, or export an agreed itinerary. Use for indirect requests such as 48 hours in Lisbon with limited hills. Do not run this workflow for a standalone weather or exchange-rate lookup.
 ---
 
-1. Establish the city, trip dates, arrival and departure constraints, starting
-   neighborhood, interests, and any mobility or walking limits that affect the plan. Use
-   preferences from setup when available. For undated plans, build a flexible sequence
-   and ask for exact dates before calendar export.
-2. Cluster each day geographically into morning, afternoon, and evening. Order stops by
-   a plausible walking route and check for obstacles such as rivers, steep grades, or
-   limited crossings. Budget walking time at the user's pace, attraction time, meals,
-   queues, and rest. Trim optional stops before overloading the day.
-3. Show the estimated distance and travel time for each leg. For transit, separate
-   station access, waiting, transfers, and travel where possible. Add an explicit buffer
-   based on frequency and the consequences of a delay. Leave extra time before timed
-   tickets and departures. Verify opening days and hours, reservations, and transit
-   details with available tools and label estimates or details still to confirm.
-4. When forecast tools are available and dates are in range, use the latest destination
-   forecast. Cite the provider and timestamp and match wet periods to the scheduled
-   blocks. Pair outdoor stops with nearby indoor backups and verify their hours where
-   possible. For a rain audit, preserve the original itinerary and show proposed swaps
-   with travel implications. When forecasts are unavailable or dates are outside the
-   forecast range, provide conditional backup options.
-5. Show source prices in local currency and convert estimates using a current
-   exchange-rate source when available. Include the rate, source date, and rounding. If
-   a rate cannot be verified, show local prices or calculate with a user-supplied rate
-   and label it.
-6. For an .ics export, resolve exact dates, destination time zone, and event start and
-   end times. Interpret the itinerary in destination local time and convert to UTC using
-   the correct offset on each date. Generate an RFC 5545 calendar with VCALENDAR,
-   VERSION, PRODID, and a VEVENT for each scheduled block. Include unique UID, UTC
-   DTSTAMP, DTSTART, DTEND, SUMMARY, and LOCATION when known. Escape text fields, fold
-   long lines at 75 octets, and use CRLF line endings. Check that times and event order
-   match the itinerary. Provide the .ics file when file creation is available.
-7. For route export, provide ordered directions links grouped by day and travel mode,
-   with addresses and a plain-text stop order for reference. Split links at changes of
-   travel mode or when waypoint limits apply. Use verified coordinates if a traveler
-   requests a geospatial export. Identify any legs with unverified routing.
+1. Call `settings.read`. Explicit trip instructions override defaults. Establish
+   destination, dates, starting area, interests, arrival/departure constraints,
+   accessibility needs and budget. Ask only what is needed; an undated plan can
+   be a flexible sequence. Never require home airport for city-only planning.
+2. Use `search_neighborhood_pois` for real places and coordinates when needed.
+   Reuse supplied verified data instead of forcing duplicate lookups. Group
+   morning/afternoon/evening geographically; avoid backtracking and account for
+   hills, river crossings, meals, queues and rests. Read
+   [transit buffers](references/transit-buffers.md) for timing estimates.
+3. Use `get_weather_and_fx` for destination forecasts when appropriate. Match
+   returned dates to the trip; the current tool supplies a rolling forecast,
+   not arbitrary-date weather. For FX alone use `wayfinder.exchange_rate` (USD
+   base) without requesting a full itinerary. Inspect actual returned rates and
+   source dates; never present a fallback rate of 1 as a verified conversion.
+4. When rain threatens an outdoor block, propose nearby indoor alternatives
+   following [rain planning](references/rain-planning.md). Verify opening times,
+   accessibility, tickets and dietary suitability with available sources or
+   clearly mark them unverified. Do not claim straight-line distances are walking
+   routes. Live provider failures must remain visible; do not invent results.
+5. Call `render_neighborhood_explorer` with selected real coordinates. Its current
+   currency selector supports USD, EUR and JPY only. For CAD/GBP preferences,
+   label the widget's USD display and provide the preferred-currency budget in
+   text using a verified conversion; do not silently change saved preferences.
+6. Present a per-day table: Time | Neighborhood/stop | Travel estimate |
+   Rain backup | Estimated cost in preferred currency. State the FX date, key
+   timing assumptions and details still to verify. Do not promise deterministic
+   routing, availability, guaranteed accessibility, or safe allergen exposure.
+7. Save with `wayfinder.save_trip` only when requested. Use stable trip IDs and
+   the complete current itinerary when updating; same-ID writes replace it.
+   Open the dashboard/tray for that ID when requested. For file exports, read
+   [export formats](references/exports.md). A `.trip` workspace file is separate
+   from the persistent trip library; editing one does not update the other.
+
+The room picker is an illustrative preference demo. `hold_boutique_stay` is a
+simulation, not a confirmed hotel reservation. Never describe either as a real
+booking or payment. Do not invoke a hold unless explicitly requested.

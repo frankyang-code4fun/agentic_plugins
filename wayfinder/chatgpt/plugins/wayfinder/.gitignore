@@ -1,2 +1,1 @@
-server/dist/
-web/dist/
+# Built server and views are committed for direct GitHub installation.

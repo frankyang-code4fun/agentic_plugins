@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "wayfinder": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/server/dist/stdio.mjs"
+      ],
+      "cwd": "${PLUGIN_ROOT}",
+      "env": {
+        "WAYFINDER_PLUGIN_ROUTE": "wayfinder@wayfinder-oss"
+      }
+    }
+  }
+}

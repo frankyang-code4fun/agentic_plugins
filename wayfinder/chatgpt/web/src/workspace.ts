@@ -27,6 +27,7 @@ const tripSchema = z.object({
   checklist: z.array(z.object({ label: z.string(), done: z.boolean() })),
 });
 const dataSchema = z.object({
+  pluginRoute: z.string().default("wayfinder@wayfinder-oss"),
   mode: z.enum(["dashboard", "itinerary_tray"]),
   trips: z.array(tripSchema),
   activeTripId: z.string().nullable(),
@@ -35,6 +36,7 @@ type Trip = z.infer<typeof tripSchema>;
 const app = new App({ name: "Wayfinder Workspace", version: "1.0.0" });
 const root = document.querySelector<HTMLElement>("#app")!;
 let data: z.infer<typeof dataSchema> = {
+  pluginRoute: "wayfinder@wayfinder-oss",
   mode: "dashboard",
   trips: [],
   activeTripId: null,
@@ -208,7 +210,7 @@ function render() {
           `/trips?tripId=${encodeURIComponent(trip.id)}`,
         );
         const result = await app.openLink({
-          url: `codex://plugins/plugins_6aefb5a47e94819194d85b9b9e98899d/app/wayfinder.dashboard?path=${path}`,
+          url: `codex://plugins/${data.pluginRoute.split("@").map(encodeURIComponent).join("@")}/app/wayfinder.dashboard?path=${path}`,
         });
         if (result.isError)
           throw new Error("The host could not open the trip link.");

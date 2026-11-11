@@ -1,0 +1,30 @@
+{
+  "interface": {
+    "category": "Productivity",
+    "composerIcon": "./assets/compass.svg",
+    "defaultPrompt": [
+      "Plan a 3-day walkable city trip with neighborhood clusters and transit buffers. Ask me for the destination and dates.",
+      "Audit my itinerary for rain and suggest nearby indoor backups. Ask me to share the itinerary and dates.",
+      "Export my itinerary as an .ics schedule using local event times. Ask me for any missing dates, times, or destination."
+    ],
+    "developerName": "Frank Yang",
+    "displayName": "Wayfinder",
+    "logo": "./assets/compass.svg",
+    "longDescription": "Plan realistic city days with neighborhood clusters, transit buffers, rain alternatives, and calendar and route exports. Live checks depend on the tools available in the host.",
+    "shortDescription": "Walkable travel itineraries",
+    "capabilities": []
+  },
+  "requires_local_executor": true,
+  "name": "wayfinder",
+  "version": "0.1.6",
+  "description": "Plan walkable neighborhood itineraries with weather checks, currency conversion, and calendar and route exports.",
+  "author": {
+    "name": "Frank Yang",
+    "email": "xiaoy1028@gmail.com"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "skills": "./skills",
+  "mcpServers": "./.mcp.json",
+  "onboardingSkill": "./skills/setup/SKILL.md"
+}

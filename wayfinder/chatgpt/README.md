@@ -301,3 +301,117 @@ cd ../server
 npm run build:plugin
 node test/workspace.mjs
 ```
+
+## Section 8: saved-trip mentions and choice forms
+
+The server advertises `extensions["openai/mentions"].searchTool` as
+`wayfinder.mentions`. Search matches trip ID, title, destination and dates,
+case-insensitively; an empty query lists up to 30 trips. Results link to readable
+`wayfinder://trips/{id}` JSON resources, so a selected mention supplies the saved
+itinerary rather than just a label. Only section-6 saved trips appear; standalone
+`.trip` files from section 7 are not automatically imported.
+
+Start a new **local Work** chat after updating the plugin. First save a trip with
+`wayfinder.save_trip` if the library is empty. Type `@Wayfinder`, select the plugin,
+and search for `kyoto` in its item picker. Pick the saved trip and ask:
+
+> Summarize this saved trip's stops and estimated USD cost. Do not change it.
+
+For the visual form, mention Wayfinder and send:
+
+> Call wayfinder.select_stay_style so I can test the illustrated room-style
+> picker and breakfast option. Do not make a booking.
+
+Choose a room and toggle breakfast, then submit. The response should reflect
+both choices. Repeat and cancel: no preference should be recorded. The room
+cards are demo illustrations, not hotel photos, inventory or quotations. This
+tool returns the selection without writing a trip, placing a hold or charging.
+
+For this SDK's older MCP protocol, extended-form hosts receive
+`openai/elicitation/create` with icon-object thumbnails. Standard-form-only hosts
+receive `elicitation/create` without thumbnails. Hosts that advertise neither
+receive an explicit unsupported-form result with a suggested chat fallback.
+Host rendering and the picker location can vary by desktop build.
+
+Regression test, from `server` after `npm run build:plugin`:
+
+```bash
+node test/mentions-and-forms.mjs
+```
+
+The test uses temporary trip storage and mock MCP clients, covering discovery,
+empty/case-insensitive/no-match searches, reading linked trips, accepted and
+cancelled forms, invalid responses, and hosts with differing form support.
+
+## Sections 9–11: settings, skills and GitHub installation
+
+Open the installed Wayfinder plugin details to find native traveler defaults:
+home airport, USD/CAD/EUR/GBP/JPY budget currency, relaxed/moderate/brisk pace,
+and dietary notes. The settings tools use the current `openai/settings` contract,
+including output schemas and group/property layout. `settings.update` accepts a
+nonempty `set` object; changing one field preserves the others. Reset by setting
+the documented default (blank airport/notes, USD, moderate). Settings persist in
+`~/.local/share/wayfinder/settings.json` (XDG_DATA_HOME respected), or
+`WAYFINDER_SETTINGS_DIR/settings.json` for isolated tests. Writes use an atomic
+rename and a lock to serialize concurrent updates.
+
+Onboarding runs the packaged setup skill. Existing users can invoke Wayfinder
+and ask “Set my defaults to YYZ, CAD, relaxed walking, vegetarian.” Start another
+local chat and ask it to read your defaults to verify persistence. Native UI and
+first-install onboarding still require testing in the actual desktop host.
+
+Skill checks to run in separate local chats:
+
+| Prompt | Expected behavior |
+| --- | --- |
+| Plan a walkable three-day Kyoto itinerary | Read settings, clarify missing dates/constraints, gather data, render map and daily table |
+| I have 48 hours in Lisbon and hate steep hills | Activate planning skill without naming it; account for hills and mobility |
+| Audit my saved Kyoto trip for rain alternatives | Preserve the itinerary and propose nearby swaps; save only if requested |
+| What is the USD to JPY rate? | Use the FX tool directly, without a multi-day planning workflow |
+
+Skills guide behavior; these model-driven checks are manual acceptance tests,
+not guaranteed by a schema check. Reference documents cover transit buffers,
+rain planning, and calendar/route exports.
+
+### Install from GitHub
+
+Prerequisites: Node.js 22+ on PATH and a desktop host with local plugin support.
+The repository's `.agents/plugins/marketplace.json` points to the packaged plugin
+under `wayfinder/chatgpt/plugins/wayfinder`. Its server and all UI bundles are
+committed, so consumers do not build dependencies.
+
+```bash
+codex plugin marketplace add frankyang-code4fun/agentic_plugins
+```
+
+Then open the desktop Plugins page, choose **Wayfinder Open-Source Travel
+Plugins**, and install Wayfinder. Start a new **local Work** conversation. This
+is a separate installation from the private account plugin updated in this chat;
+use one copy at a time to avoid ambiguity. GitHub distributes files and does not
+host the running MCP server. No Cloudflare tunnel is required.
+
+For updates, use `codex plugin marketplace upgrade --help` for your CLI's options,
+refresh the marketplace, then update/reinstall the plugin through the desktop UI.
+Do not edit plugin cache files directly.
+
+### Contributor release checks
+
+Run `npm ci` in both `web` and `server`, then:
+
+```bash
+cd server
+npm run build:plugin
+node test/settings-package.mjs
+node test/workspace.mjs
+node test/mentions-and-forms.mjs
+cd ../web
+../server/node_modules/.bin/tsx --test test/travel-formats.test.ts
+node --test test/file-editor-host.test.mjs
+```
+
+Commit source, lockfiles, manifests and rebuilt plugin bundles together. Keep
+portable and compatibility manifest versions synchronized. The clean-package
+test copies the install directory away from source/node_modules, starts its
+bundled server, checks all views and validates settings persistence/updates.
+The private account release uses `WAYFINDER_PLUGIN_ROUTE` set to its account
+plugin ID; the GitHub package uses `wayfinder@wayfinder-oss` for deep links.
