@@ -201,3 +201,103 @@ backend, including expiry and persistence. Its current inputs also require
 Hotel search currently returns general hotel nodes without boutique classification
 or distance sorting. A request for the closest boutique hotel needs additional
 implementation and verification.
+
+## Section 6: trip library and itinerary tray
+
+The local plugin provides `wayfinder.dashboard` (global navigation) and
+`wayfinder.itinerary_tray` (a content tab in a local Work conversation). Both
+accept `{}`. Select a saved trip in either view; a tray does not infer a trip from
+another conversation. Open it with `{ "tripId": "kyoto-test" }` to select a trip
+explicitly. While visible, the views refresh saved data every 15 seconds.
+
+Use `wayfinder.save_trip` to persist a full itinerary (same ID replaces that trip).
+Trips are stored under `$XDG_DATA_HOME/wayfinder/trips`, falling back to
+`~/.local/share/wayfinder/trips`, outside the installed plugin directory.
+`WAYFINDER_DATA_DIR` overrides the directory for testing. Checklist changes are
+made through the save tool. Budget amounts are estimated USD costs; the exchange
+button requests the latest daily reference rate and displays its date. It does
+not claim a live trading quote or silently substitute a rate when unavailable.
+
+After updating the installed plugin, start a **local Work** chat and try:
+
+> @Wayfinder Save a test trip with ID kyoto-test, title Kyoto test, destination
+> Kyoto, and display currency JPY. For 2026-11-18, add Gojo Cafe at 09:00 with an
+> estimated USD cost of 10, and a neighborhood walk at 10:00 costing USD 0.
+> Add an unchecked “Pack umbrella” reminder. Open wayfinder.itinerary_tray for
+> kyoto-test. These are test estimates; no live place search is needed.
+
+Expect two stops, a USD 10 total, and the reminder. Select Refresh exchange rate
+to see the JPY estimate and rate date. Open Trip Library from global navigation,
+select the saved trip, and try Continue planning. Reopen the library to verify
+persistence. Each tray requires its own selection. No server command or tunnel
+is needed for the installed stdio plugin.
+
+The desktop deep link uses the installed account plugin ID and an encoded
+app-relative path (not the guide's old top-level `tripId` query parameter):
+
+```text
+codex://plugins/plugins_6aefb5a47e94819194d85b9b9e98899d/app/wayfinder.dashboard?path=%2Ftrips%3FtripId%3Dkyoto-test
+```
+
+Protocol regression check (after `npm run build:plugin`):
+
+```bash
+cd wayfinder/chatgpt/server
+node test/workspace.mjs
+```
+
+This uses temporary trip storage and checks both empty-input entrypoints,
+resource bundling, persistence across process restarts, isolated tray selection,
+input validation, and USD conversion.
+
+## Section 7: travel file viewer/editor
+
+`wayfinder.open_file` registers `.trip`, `.ics`, and `.gpx` file entrypoints.
+Open a file attachment or workspace file in a **local Work** chat with Wayfinder
+installed. The host supplies the file's opaque resource URI. Do not invent a URI
+or call the tool with an arbitrary filesystem path. No server or tunnel launch
+is required for the installed plugin.
+
+Use copies of `examples/kyoto-test.trip`, `examples/kyoto-test.ics`, and
+`examples/kyoto-test.gpx` for testing. These are illustrative data, not bookings
+or a verified route.
+
+1. Start a new local Work chat after the plugin update. Attach the examples folder
+   as local context (or copies of its files) and ask ChatGPT to show clickable
+   references to those three files. Click one and select Wayfinder if a viewer
+   chooser appears.
+2. In `.trip`, change the cafe time from 09:00 to 09:30 and its estimated cost to
+   12. Click **Save to file**, then **Reload from file** to verify the edit.
+3. In `.ics`, change the event title; retain the displayed start/end format.
+   Save and reopen. The Asia/Tokyo time-zone parameter remains in the file.
+4. In `.gpx`, inspect the elevation profile and change a point's elevation.
+   Save/reload and verify the new elevation. The horizontal axis is point order,
+   not route distance. Existing route/track segments and XML extensions remain.
+5. For a conflict test, edit a field without saving, then change the same file
+   externally in a text editor. Click **Save to file**. The editor must report a
+   conflict and retain your draft. Copy edited source before confirming a reload.
+
+Read-only attachments have disabled fields and Save. The editor requires both
+`writable: true` and a nonempty ETag from the host; use an authorized local file
+for save-back testing. Failed/conflicting saves are never reported as success.
+
+The editor supports the section-6 `.trip` schema (`title`, `days[].date`, and
+`days[].stops[]` with `time`, `name`, `estimatedCostUsd`, optional `notes`). It edits
+existing rows via fields. For `.trip`, drag a stop onto another stop in the same
+day to swap their time slots. Adding/deleting events is not provided. Calendar recurrence rules are preserved rather than expanded;
+editing a recurring event changes its definition. GPX is edited as points with
+an elevation preview, not as a street map. Files above 2 MB are rejected. JSON,
+ICS and XML serialization can normalize whitespace while retaining other data.
+These files remain separate from the section-6 saved-trip library.
+
+Verification commands from `wayfinder/chatgpt`:
+
+```bash
+cd web
+../server/node_modules/.bin/tsx --test test/travel-formats.test.ts
+node --test test/file-editor-host.test.mjs
+npx tsc --noEmit --target ES2022 --module ESNext --moduleResolution bundler --lib ES2022,DOM --skipLibCheck src/*.ts
+cd ../server
+npm run build:plugin
+node test/workspace.mjs
+```

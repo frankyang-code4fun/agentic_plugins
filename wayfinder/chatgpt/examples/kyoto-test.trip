@@ -1,0 +1,11 @@
+{
+  "id": "kyoto-file-test",
+  "title": "Kyoto file editor test",
+  "destination": "Higashiyama, Kyoto",
+  "currency": "JPY",
+  "days": [{"date": "2026-11-18", "stops": [
+    {"time": "09:00", "name": "Gojo Cafe", "estimatedCostUsd": 10, "notes": "Test estimate, not a booking."},
+    {"time": "10:00", "name": "Neighborhood walk", "estimatedCostUsd": 0, "notes": "Bring an umbrella."}
+  ]}],
+  "checklist": [{"label": "Pack umbrella", "done": false}]
+}

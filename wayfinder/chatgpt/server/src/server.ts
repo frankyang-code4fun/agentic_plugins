@@ -1,3 +1,5 @@
+import { registerFileEditor } from "./file-editor.js";
+import { registerWorkspaceEntrypoints } from "./entrypoints.js";
 import { registerExploreUi } from "./ui-explore.js";
 import { z } from "zod";
 
@@ -207,5 +209,7 @@ export function createWayfinderServer() {
     },
   );
   registerExploreUi(server);
+  registerWorkspaceEntrypoints(server);
+  registerFileEditor(server);
   return server;
 }
